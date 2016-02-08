@@ -42,8 +42,8 @@
 
 
     <svg width="100%" height="100%">
-      <polygon class="new-poly" fill="green" stroke="blue" stroke-width="2"
-        points="400,400 400,500 500,500 500,400" />
+      <polygon class="new-poly" fill="blue" stroke="blue" stroke-width="2"
+        points="700,400 700,500 800,500 800,400" />
     </svg>
 
     <script>
@@ -71,10 +71,11 @@
           d3.select('svg')
             .append('polygon')
             .attr('class', 'new-poly')
-            .attr('fill', 'green')
+            .attr('fill', 'blue')
             .attr('stroke', 'blue')
             .attr('stroke-width', 2)
-            .attr('points', newPoints);
+            .attr('points', newPoints)
+            .attr("style", "fill-opacity:" + (Math.random() + 0.5) / 2);
         }
       }
 
@@ -98,15 +99,16 @@
           var points = $( this ).attr('points');
           createNewSquares(points);
 
-          if ( $(this).attr('class') == 'new-poly') {
-            $(this).attr('fill', 'red').attr('class', 'poly-2');
-          } else if ($(this).attr('class') == 'poly-2') {
-            $(this).attr('fill', 'yellow').attr('class', 'poly-3');
-          } else if ($(this).attr('class') == 'poly-3') {
-            $(this).attr('fill', 'blue').attr('class', 'poly-4');
-          } else {
-            // $(this).attr('style', 'display:none');
-          }
+          // if ( $(this).attr('class') == 'new-poly') {
+          //   $(this).attr('fill', 'red').attr('class', 'poly-2');
+          // } else if ($(this).attr('class') == 'poly-2') {
+          //   $(this).attr('fill', 'yellow').attr('class', 'poly-3');
+          // } else if ($(this).attr('class') == 'poly-3') {
+          //   $(this).attr('fill', 'blue').attr('class', 'poly-4');
+          // } else {
+          //   // $(this).attr('style', 'display:none');
+          // }
+
         })
 
         counter++;

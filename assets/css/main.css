@@ -27,14 +27,6 @@ html, body {
   font-weight: bold;
 }
 
-svg.centered {
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 /*div {
   float: left;
   width: 200px;

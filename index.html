@@ -14,10 +14,6 @@
     <svg width="100%" height="100%">
       <polygon fill="yellow" stroke="blue" stroke-width="2"
         points="400,400 400,500 500,500 500,400" />
-        <polygon fill="yellow" stroke="blue" stroke-width="2"
-          points="200,200 200,300 300,300 300,200" />
-          <polygon fill="yellow" stroke="blue" stroke-width="2"
-            points="0,0 0,100 100,100 100,0" />
     </svg>
 
     <script>
@@ -26,7 +22,7 @@
         var result = [];
         points.split(' ').forEach(function(point) {
           var intPair = [];
-          point.forEach(function(num){
+          point.split(',').forEach(function(num){
             intPair.push(parseInt(num));
           });
 
@@ -41,23 +37,46 @@
         var y = point[1];
         var newPoints = x+','+y+' '+x+','+(y+100)+' '+(x+100)+','+(y+100)+' '+(x+100)+','+y;
 
-        d3.select('svg')
-          .append('polygon')
-          .attr('fill', 'yellow')
-          .attr('stroke', 'blue')
-          .attr('stroke-width', 2)
-          .attr('points', newPoints);
+        if (!$('polygon[points="' + newPoints + '"]')[0]) {
+          d3.select('svg')
+            .append('polygon')
+            .attr('class', 'new-poly')
+            .attr('fill', 'yellow')
+            .attr('stroke', 'blue')
+            .attr('stroke-width', 2)
+            .attr('points', newPoints);
+        }
       }
 
       createNewSquares = function(points) {
         var parsedPoints = parsePoints(points);
 
-        left = parsedPoints[0]
+        var left = [parsedPoints[0][0] - 100, parsedPoints[0][1]];
+        var top = [parsedPoints[0][0], parsedPoints[0][1] - 100];
+        var bottom= parsedPoints[1];
+        var right = parsedPoints[3];
+
+        createNewSquare(left);
+        createNewSquare(top);
+        createNewSquare(bottom);
+        createNewSquare(right);
       }
 
-      setTimeout(function() {
-        createNewSquare([50, 50]);
-      }, 2000);
+      var counter = 0;
+      var animationInterval = setInterval(function() {
+        $('polygon').each(function() {
+          var points = $( this ).attr('points');
+          createNewSquares(points);
+        })
+
+        counter++;
+
+        if (counter == 20) {
+          clearInterval(animationInterval);
+        }
+      }, 500);
+
+
 
     </script>
 

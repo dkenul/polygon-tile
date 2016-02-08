@@ -6,6 +6,7 @@
     <title>Damon's Code</title>
     <link rel="stylesheet" type="text/css" href="assets/css/main.css">
     <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
   </head>
   <body>
 
@@ -23,18 +24,40 @@
 
       parsePoints = function(points) {
         var result = [];
-        points.split(' ').forEach(function(el) {result.push(el.split(','))});
+        points.split(' ').forEach(function(point) {
+          var intPair = [];
+          point.forEach(function(num){
+            intPair.push(parseInt(num));
+          });
+
+          result.push(intPair);
+        });
+
         return result;
       }
 
-      createNewSquares = function(points) {
-        parsedPoints = parsePoints(points);
+      createNewSquare = function(point) {
+        var x = point[0];
+        var y = point[1];
+        var newPoints = x+','+y+' '+x+','+(y+100)+' '+(x+100)+','+(y+100)+' '+(x+100)+','+y;
+
+        d3.select('svg')
+          .append('polygon')
+          .attr('fill', 'yellow')
+          .attr('stroke', 'blue')
+          .attr('stroke-width', 2)
+          .attr('points', newPoints);
       }
 
-      // setInterval(function() {
-      //   $('polygon').each();
-      //   $('svg').append(newShapes)
-      // }, 2000);
+      createNewSquares = function(points) {
+        var parsedPoints = parsePoints(points);
+
+        left = parsedPoints[0]
+      }
+
+      setTimeout(function() {
+        createNewSquare([50, 50]);
+      }, 2000);
 
     </script>
 

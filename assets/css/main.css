@@ -1,0 +1,86 @@
+html, body, section, article, header,
+h1, h2, h3, p, strong, em, a, ul, div, img {
+ margin: 0;
+ border: 0;
+ padding: 0;
+ outline: 0;
+
+ box-sizing: inherit;
+ font: inherit;
+ text-decoration: inherit;
+ text-align: inherit;
+ color: inherit;
+
+ background: transparent;
+ list-style: none;
+}
+
+.group:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+html, body {
+  height: 100%;
+  font-family: "Arial";
+  font-weight: bold;
+}
+
+svg.centered {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/*div {
+  float: left;
+  width: 200px;
+  height: 200px;
+  background: red;
+  box-sizing: border-box;
+  border: 1px solid blue;
+}*/
+
+/*@keyframes test {
+    from {left: 100%;}
+    to {left: 20px;}
+}
+
+@keyframes test2 {
+    from {left: 100%; border-top-color: black;}
+    to {left: 40px; border-top-color: black;}
+}
+
+div {
+  height: 0px;
+  width: calc(100% - 40px);
+  position: relative;
+  left: 20px;
+  border-top: 5px solid black;
+  border-left: 20px solid white;
+
+  color: red;
+  background: black;
+  animation-name: test;
+  animation-duration: 5s;
+  animation-timing-function: linear;
+}
+
+p {
+  height: 0px;
+  width: calc(100% - 60px);
+  position: relative;
+  left: 40px;
+  border-top: 5px solid white;
+  border-left: 20px solid white;
+  margin-top: 10px;
+
+  animation-name: test2;
+  animation-timing-function: linear;
+  animation-delay: 2s;
+  animation-duration: 4s;
+  animation-fill-mode: forwards;
+}*/

@@ -67,7 +67,10 @@
         var y = point[1];
         var newPoints = x+','+y+' '+x+','+(y+100)+' '+(x+100)+','+(y+100)+' '+(x+100)+','+y;
 
-        if (!$('polygon[points="' + newPoints + '"]')[0]) {
+        if (!$('polygon[points="' + newPoints + '"]')[0] &&
+            !(x < 0 || x > $(window).width()) &&
+            !(y < 0 || y > $(window).height())) {
+
           d3.select('svg')
             .append('polygon')
             .attr('class', 'new-poly')
@@ -76,6 +79,7 @@
             .attr('stroke-width', 2)
             .attr('points', newPoints)
             .attr("style", "fill-opacity:" + (Math.random() + 0.5) / 2);
+
         }
       }
 
@@ -113,10 +117,10 @@
 
         counter++;
 
-        if (counter == 15) {
-          clearInterval(animationInterval);
-        }
-      }, 300);
+        // if (counter == 16) {
+        //   clearInterval(animationInterval);
+        // }
+      }, 200);
 
 
 

@@ -1,4 +1,8 @@
-var PolygonFill = function() {
+var PolygonTile = function(polySize, polyColor) {
+
+  var polySize = polySize || 100;
+  var polyColor = polyColor || 'blue';
+
   var parsePoints = function(points) {
     var result = [];
     points.split(' ').forEach(function(point) {
@@ -16,17 +20,17 @@ var PolygonFill = function() {
   var createNewSquare = function(point) {
     var x = point[0];
     var y = point[1];
-    var newPoints = x+','+y+' '+x+','+(y+100)+' '+(x+100)+','+(y+100)+' '+(x+100)+','+y;
+    var newPoints = x+','+y+' '+x+','+(y+polySize)+' '+(x+polySize)+','+(y+polySize)+' '+(x+polySize)+','+y;
 
     if (!$('polygon[points="' + newPoints + '"]')[0] &&
-        !(x < 0 || x > $(window).width()) &&
-        !(y < 0 || y > $(window).height())) {
+        !(x < -(polySize) || x > $(window).width()) &&
+        !(y < -(polySize) || y > $(window).height())) {
 
       d3.select('svg')
         .append('polygon')
         .attr('class', 'new-poly')
-        .attr('fill', 'blue')
-        .attr('stroke', 'blue')
+        .attr('fill', polyColor)
+        .attr('stroke', polyColor)
         .attr('stroke-width', 2)
         .attr('points', newPoints)
         .attr("style", "fill-opacity:" + (Math.random() + 0.5) / 2);
@@ -37,8 +41,8 @@ var PolygonFill = function() {
   var createNewSquares = function(points) {
     var parsedPoints = parsePoints(points);
 
-    var left = [parsedPoints[0][0] - 100, parsedPoints[0][1]];
-    var top = [parsedPoints[0][0], parsedPoints[0][1] - 100];
+    var left = [parsedPoints[0][0] - polySize, parsedPoints[0][1]];
+    var top = [parsedPoints[0][0], parsedPoints[0][1] - polySize];
     var bottom= parsedPoints[1];
     var right = parsedPoints[3];
 
@@ -51,27 +55,28 @@ var PolygonFill = function() {
   this.startAnimation = function() {
     var counter = 0;
     var animationInterval = setInterval(function() {
+      startX = ($(window).width() - polySize) / 2
+      startY = ($(window).height() - polySize) / 2
+      if (counter == 0) {
+        d3.select('body')
+          .append('svg')
+          .attr('width', '100%')
+          .attr('height', '100%');
+
+        createNewSquare([startX, startY]);
+      }
+
+
       $('polygon').each(function() {
         var points = $( this ).attr('points');
         createNewSquares(points);
-
-      // if ( $(this).attr('class') == 'new-poly') {
-      //   $(this).attr('fill', 'red').attr('class', 'poly-2');
-      // } else if ($(this).attr('class') == 'poly-2') {
-      //   $(this).attr('fill', 'yellow').attr('class', 'poly-3');
-      // } else if ($(this).attr('class') == 'poly-3') {
-      //   $(this).attr('fill', 'blue').attr('class', 'poly-4');
-      // } else {
-      //   // $(this).attr('style', 'display:none');
-      // }
-
       })
 
       counter++;
 
-      if (counter == 25) {
+      if (counter == 30) {
         clearInterval(animationInterval);
       }
-    }, 200)
+    }, 150)
   };
 }

@@ -5,13 +5,13 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var numSides = numSides || 4;
   var isRegular = numSides == 3 || numSides == 4 || numSides == 6;
 
-  var createRegularPolygon = function(point, offset) {
+  var createPolygon = function(point, offset) {
     offset = offset || 0;
     var points = [];
 
-    for (var i = 1; i <= numSides; i++) {
-      var x = point[0] + radius * Math.cos(2*Math.PI*i/numSides + offset);
-      var y = point[1] + radius * Math.sin(2*Math.PI*i/numSides + offset);
+    for (var i = 0; i < numSides; i++) {
+      var x = point[0] + radius * Math.sin(2*Math.PI*i/numSides + offset);
+      var y = point[1] - radius * Math.cos(2*Math.PI*i/numSides + offset);
 
       points.push(x + ',' + y);
     }
@@ -96,7 +96,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
           .attr('width', '100%')
           .attr('height', '100%');
 
-        createRegularPolygon([startX, startY]);
+        createPolygon([startX, startY], 0);
       }
 
 
@@ -125,7 +125,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
           .attr('width', '100%')
           .attr('height', '100%');
 
-        createRegularPolygon([startX, startY]);
+        createPolygon([startX, startY]);
       }
 
 

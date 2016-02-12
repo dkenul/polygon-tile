@@ -10,8 +10,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
     return +(Math.round(num + "e+12")  + "e-12");
   };
 
-  var createPolygon = function(point, offset) {
-
+  var createPolygon = function(point, offset, iteration) {
+    iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];
 
@@ -30,19 +30,18 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
       d3.select('svg')
         .append('polygon')
-        .attr('class', 'new-poly')
+        .classed('new-poly ' + 'poly-' + iteration, true)
         .attr('fill', polyColor)
         .attr('stroke', polyColor)
         .attr('stroke-width', 2)
         .attr('points', points)
         .attr("style", "fill-opacity:" + (Math.random() + 0.5) / 2)
-        .datum({"center": point, "offset": offset});
+        .datum({"center": point, "offset": offset, "iteration": iteration});
     }
 
   };
 
-  var appendRegular = function(point, offset) {
-    debugger;
+  var appendRegular = function(point, offset, iteration) {
     offset = offset + tiltAmount || 0;
     var halfAngle = (Math.PI / numSides);
     var centerToSide = radius*Math.cos(halfAngle);
@@ -54,9 +53,9 @@ var PolygonTile = function(radius, polyColor, numSides) {
       var y = roundBig(point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset));
 
       if (numSides % 2 == 0) {
-        createPolygon([x,y], 0);
+        createPolygon([x,y], 0, iteration);
       } else {
-        createPolygon([x,y], 2*Math.PI*i/numSides + offset);
+        createPolygon([x,y], 2*Math.PI*i/numSides + offset, iteration);
       }
     }
   };
@@ -115,13 +114,35 @@ var PolygonTile = function(radius, polyColor, numSides) {
     tiltAmount += (2*Math.PI / 8)
 
     return this;
-  }
+  };
 
-  this.animate = function() {
+  this.animateRemoval = function(speed, stop) {
+    speed = speed || 150;
+
+    var counter = 0;
+
+    var animationInterval = setInterval(function() {
+      d3.selectAll('.poly-' + counter).each(function() {
+        var current = d3.select(this);
+        current.style({display: "none"});
+      })
+
+      counter++;
+
+      if (stop && counter == stop) {
+        clearInterval(animationInterval);
+      }
+    }, speed)
+  };
+
+  this.animate = function(speed) {
+    speed = speed || 150;
+
     var counter = 0;
     var animationInterval = setInterval(function() {
       startX = (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - radius) / 2
       startY = (Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - radius) / 2
+
       if (counter == 0) {
         d3.select('body')
           .append('svg')
@@ -129,25 +150,74 @@ var PolygonTile = function(radius, polyColor, numSides) {
           .attr('height', '100%');
 
         createPolygon([startX, startY], 0);
+      } else {
+
+        d3.selectAll('.new-poly').each(function() {
+          var current = d3.select(this);
+          var center = current.datum().center;
+          var offset = current.datum().offset;
+          appendRegular(center, offset, counter);
+
+          current.classed('new-poly', false);
+        })
       }
-
-
-      d3.selectAll('polygon').each(function() {
-        var current = d3.select(this);
-        var center = current.datum().center;
-        var offset = current.datum().offset;
-        appendRegular(center, offset);
-
-        current.attr('class', '');
-      })
 
       counter++;
 
       if (counter == 30) {
         clearInterval(animationInterval);
       }
-    }, 150)
+    }.bind(this), speed)
   };
+
+  this.animateExisting = function(speed, stop) {
+    speed = speed || 150;
+
+    var counter = 0;
+
+    var animationInterval = setInterval(function() {
+      d3.selectAll('.poly-' + counter).each(function() {
+        var current = d3.select(this);
+        current.style({display: "block"});
+      })
+
+      counter++;
+
+      if (stop && counter == stop) {
+        clearInterval(animationInterval);
+      }
+    }, speed)
+  }
+
+  this.animateThenRemove = function(delay, animationSpeed, removalSpeed, stop) {
+    delay = delay || 3000;
+    animationSpeed = animationSpeed || 100;
+    removalSpeed = removalSpeed || 150;
+
+    this.animate(animationSpeed);
+
+    setTimeout(function() {
+      this.animateRemoval(removalSpeed, stop);
+    }.bind(this), delay)
+  };
+
+  this.addRemoveCycle = function(delay) {
+    delay = delay || 2000;
+
+    this.animate();
+
+    counter = 1;
+    setInterval(function() {
+      if (counter % 2 == 0) {
+        this.animateRemoval();
+      } else {
+        this.animateExisting();
+      }
+
+      counter++;
+
+    }.bind(this), delay)
+  }
 
   // this.render = function() {
   //   var counter = 0;

@@ -43,7 +43,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
   var appendRegular = function(point, offset) {
     debugger;
-
     offset = offset + tiltAmount || 0;
     var halfAngle = (Math.PI / numSides);
     var centerToSide = radius*Math.cos(halfAngle);
@@ -134,9 +133,12 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
 
       d3.selectAll('polygon').each(function() {
-        var center = d3.select(this).datum().center;
-        var offset = d3.select(this).datum().offset;
+        var current = d3.select(this);
+        var center = current.datum().center;
+        var offset = current.datum().offset;
         appendRegular(center, offset);
+
+        current.attr('class', '');
       })
 
       counter++;

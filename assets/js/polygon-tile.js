@@ -10,15 +10,28 @@ var PolygonTile = function(radius, polyColor, numSides) {
     var points = [];
 
     for (var i = 1; i <= numSides; i++) {
-      var x = point[0] + Math.cos(2*Math.pi*i/numSides + offset);
-      var y = point[1] + Math.sin(2*Math.pi*i/numSides + offset);
+      var x = point[0] + radius * Math.cos(2*Math.PI*i/numSides + offset);
+      var y = point[1] + radius * Math.sin(2*Math.PI*i/numSides + offset);
 
       points.push(x + ',' + y);
     }
 
     points = points.join(' ');
 
+    if (!$('polygon[points="' + points + '"]')[0] &&
+        !(x < -(radius) || x > $(window).width()) &&
+        !(y < -(radius) || y > $(window).height())) {
 
+      d3.select('svg')
+        .append('polygon')
+        .attr('class', 'new-poly')
+        .attr('fill', polyColor)
+        .attr('stroke', polyColor)
+        .attr('stroke-width', 2)
+        .attr('points', points)
+        .attr("style", "fill-opacity:" + (Math.random() + 0.5) / 2)
+        .data({"center": point})
+    }
 
   };
 
@@ -28,7 +41,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
     points.split(' ').forEach(function(point) {
       var intPair = [];
       point.split(',').forEach(function(num){
-        intPair.push(parseInt(num));
+        intPair.push(parseFloat(num));
       });
 
       result.push(intPair);
@@ -83,14 +96,14 @@ var PolygonTile = function(radius, polyColor, numSides) {
           .attr('width', '100%')
           .attr('height', '100%');
 
-        createNewSquare([startX, startY]);
+        createRegularPolygon([startX, startY]);
       }
 
 
-      $('polygon').each(function() {
-        var points = $( this ).attr('points');
-        createNewSquares(points);
-      })
+      // $('polygon').each(function() {
+      //   var points = $( this ).attr('points');
+      //   createNewSquares(points);
+      // })
 
       counter++;
 
@@ -112,7 +125,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
           .attr('width', '100%')
           .attr('height', '100%');
 
-        createNewSquare([startX, startY]);
+        createRegularPolygon([startX, startY]);
       }
 
 

@@ -14,7 +14,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var pointStore = [];
 
   var checkRoundingError = function(num1, num2) {
-    debugger;
     return (num1 == num2 || num1 + 1 == num2 || num1 - 1 == num2);
   }
 

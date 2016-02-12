@@ -1,3 +1,9 @@
+Array.prototype.rotate = function(n) {
+    while (this.length && n < 0) n += this.length;
+    this.push.apply(this, this.splice(0, n));
+    return this;
+};
+
 var PolygonTile = function(radius, polyColor, numSides) {
 
   var radius = radius || 50;
@@ -5,22 +11,52 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var numSides = numSides || 4;
   var isRegular = numSides == 3 || numSides == 4 || numSides == 6;
   var tiltAmount = 0;
+  var pointStore = [];
+
+  var checkRoundingError = function(num1, num2) {
+    debugger;
+    return (num1 == num2 || num1 + 1 == num2 || num1 - 1 == num2);
+  }
+
+  var isOverlap = function(pointsToCheck) {
+    // debugger;
+    for (var i = 0; i < pointStore.length; i++) {
+
+      var overlap = 0;
+      for (var j = 0; j < pointsToCheck.length; j++) {
+        if (checkRoundingError(Math.round(pointStore[i][j][0]), Math.round(pointsToCheck[j][0])) &&
+        checkRoundingError(Math.round(pointStore[i][j][1]), Math.round(pointsToCheck[j][1]))) {
+          overlap += 1;
+          if (overlap == numSides) {
+            return true;
+          }
+        } else {
+          break;
+        }
+      }
+    }
+
+    return false;
+  };
 
   var createPolygon = function(point, offset, iteration) {
     iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];
+    var toStore = [];
 
     for (var i = 0; i < numSides; i++) {
-      var x = roundBig(point[0] + radius * Math.sin(2*Math.PI*i/numSides + offset));
-      var y = roundBig(point[1] - radius * Math.cos(2*Math.PI*i/numSides + offset));
+      var x = (point[0] + radius * Math.sin(2*Math.PI*i/numSides + offset));
+      var y = (point[1] - radius * Math.cos(2*Math.PI*i/numSides + offset));
 
+      toStore.push([x,y])
       points.push(x + ',' + y);
     }
 
+
     points = points.join(' ');
 
-    if (!$('polygon[points="' + points + '"]')[0] &&
+    if (!isOverlap(toStore) &&
         !(x < -(radius) || x > $(window).width()) &&
         !(y < -(radius) || y > $(window).height())) {
 
@@ -33,6 +69,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
         .attr('points', points)
         .attr("style", "fill-opacity:" + (Math.random() + 0.5) / 2)
         .datum({"center": point, "offset": offset, "iteration": iteration});
+
+      pointStore.push(toStore);
     }
 
   };
@@ -45,8 +83,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
 
     for (var i = 0; i < numSides; i++) {
-      var x = roundBig(point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset));
-      var y = roundBig(point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset));
+      var x = (point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset));
+      var y = (point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset));
 
       if (numSides % 2 == 0) {
         createPolygon([x,y], 0, iteration);
@@ -193,4 +231,4 @@ var PolygonTile = function(radius, polyColor, numSides) {
   //     }
   //   }
   // };
-}
+};

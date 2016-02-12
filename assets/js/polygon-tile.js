@@ -4,9 +4,10 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var polyColor = polyColor || 'blue';
   var numSides = numSides || 4;
   var isRegular = numSides == 3 || numSides == 4 || numSides == 6;
+  var tiltAmount = 0;
 
   var createPolygon = function(point, offset) {
-    offset = offset || 0;
+    offset = offset + tiltAmount || 0;
     var points = [];
 
     for (var i = 0; i < numSides; i++) {
@@ -84,6 +85,12 @@ var PolygonTile = function(radius, polyColor, numSides) {
     createNewSquare(bottom);
     createNewSquare(right);
   };
+
+  this.tilt = function() {
+    tiltAmount += (2*Math.PI / 8)
+
+    return this;
+  }
 
   this.animate = function() {
     var counter = 0;

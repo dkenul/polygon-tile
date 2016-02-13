@@ -17,9 +17,10 @@ var PolygonTile = function(radius, polyColor, numSides) {
     return (num1 == num2 || num1 + 1 == num2 || num1 - 1 == num2);
   }
 
-  var isOverlap = function(pointsToCheck) {
-    // debugger;
+  // Checks for an Exact overlap. Better time complexity than isClipping.
+  // Useful only for 3, 4, 6 sided polygon tessellation.
 
+  var isOverlap = function(pointsToCheck) {
     for (var i = 0; i < pointStore.length; i++) {
 
       var overlap = 0;
@@ -39,7 +40,55 @@ var PolygonTile = function(radius, polyColor, numSides) {
     return false;
   };
 
+  // Checks for clipping ON POINT CONNECTIONS. This is not an area based analysis.
+  // Useful for collision detection when predefined path is guaranteed to work.
+
+  var isClipping = function(pointsToCheck) {
+    return pointStore.some(function(storedPoints) {
+      var overlap = 0;
+      var lastIsOverlap = false;
+      var isOverlap = false;
+      var sideCounter = 1;
+      var firstOverlap = false;
+      var finalOverlap = false;
+      return storedPoints.some(function(storedPoint) {
+
+
+        if (isOverlap) {
+          lastIsOverlap = true;
+        } else {
+          lastIsOverlap = false;
+        }
+
+        isOverlap = false;
+
+        pointsToCheck.forEach(function(checkPoint) {
+          if (checkRoundingError(Math.round(storedPoint[0]), Math.round(checkPoint[0])) &&
+          checkRoundingError(Math.round(storedPoint[1]), Math.round(checkPoint[1]))) {
+            overlap += 1;
+            isOverlap = true;
+          }
+        });
+
+        if (isOverlap && sideCounter == 1) {
+          firstOverlap = true;
+        } else if (isOverlap && sideCounter == numSides) {
+          finalOverlap = true;
+        }
+
+
+
+        if ((overlap == 2 && isOverlap && !(lastIsOverlap || firstOverlap && finalOverlap) || overlap > 2)) {
+          return true;
+        }
+
+        sideCounter++;
+      });
+    });
+  };
+
   var createPolygon = function(point, offset, iteration) {
+
     iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];
@@ -72,9 +121,9 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
     points = points.join(' ');
 
-    if (!isOverlap(toStore) &&
-        !(x < -(radius) || x > $(window).width()) &&
-        !(y < -(radius) || y > $(window).height())) {
+    if (!isClipping(toStore) &&
+        !(x < -(radius) || x > $(document).width()) &&
+        !(y < -(radius) || y > $(document).height())) {
 
       d3.select('svg')
         .append('polygon')
@@ -118,10 +167,10 @@ var PolygonTile = function(radius, polyColor, numSides) {
     offset += halfAngle;
     var increment;
 
-    if (iteration == 1) {
-      increment = 1
+    if (iteration == 1 && numSides == 5) {
+      increment = 1;
     } else {
-      increment = 2
+      increment = 2;
     }
 
     for (var i = 0; i < numSides; i += increment) {

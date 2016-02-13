@@ -40,7 +40,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var createPolygon = function(point, offset, iteration) {
-          debugger;
     iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];

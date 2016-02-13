@@ -19,6 +19,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
   var isOverlap = function(pointsToCheck) {
     // debugger;
+
     for (var i = 0; i < pointStore.length; i++) {
 
       var overlap = 0;
@@ -39,19 +40,36 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var createPolygon = function(point, offset, iteration) {
+          debugger;
     iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];
     var toStore = [];
+    var rotations;
+    var referenceAngle = (2*Math.PI / numSides);
 
     for (var i = 0; i < numSides; i++) {
       var x = (point[0] + radius * Math.sin(2*Math.PI*i/numSides + offset));
       var y = (point[1] - radius * Math.cos(2*Math.PI*i/numSides + offset));
 
+
+
       toStore.push([x,y])
       points.push(x + ',' + y);
     }
 
+    if (!numSides % 2 == 0) {
+      if (offset == 0) {
+        rotations = 0;
+      } else if (Math.round(offset / referenceAngle) == 0) {
+        rotations = numSides - (offset / referenceAngle);
+      } else {
+        rotations = numSides - (offset - (referenceAngle / 2)) / referenceAngle;
+      }
+
+      toStore.rotate(rotations);
+      points.rotate(rotations);
+    }
 
     points = points.join(' ');
 
@@ -93,8 +111,34 @@ var PolygonTile = function(radius, polyColor, numSides) {
     }
   };
 
+  var appendNonRegular = function(point, offset, iteration) {
+    // debugger;
+    offset = offset + tiltAmount || 0;
+    var halfAngle = (Math.PI / numSides);
+    var centerToSide = radius*Math.cos(halfAngle);
+    offset += halfAngle;
+    var increment;
+
+    if (iteration == 1) {
+      increment = 1
+    } else {
+      increment = 2
+    }
+
+    for (var i = 0; i < numSides; i += increment) {
+      var x = (point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset));
+      var y = (point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset));
+
+      if (numSides % 2 == 0) {
+        createPolygon([x,y], 0, iteration);
+      } else {
+        createPolygon([x,y], 2*Math.PI*i/numSides + offset, iteration);
+      }
+    }
+  };
+
   this.tilt = function() {
-    tiltAmount += (2*Math.PI / 8)
+    tiltAmount += (2*Math.PI / (numSides*2))
 
     return this;
   };
@@ -139,8 +183,12 @@ var PolygonTile = function(radius, polyColor, numSides) {
           var current = d3.select(this);
           var center = current.datum().center;
           var offset = current.datum().offset;
-          appendRegular(center, offset, counter);
 
+          if (isRegular) {
+            appendRegular(center, offset, counter);
+          } else {
+            appendNonRegular(center, offset, counter);
+          }
           current.classed('new-poly', false);
         })
       }

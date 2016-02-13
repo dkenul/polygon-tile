@@ -13,9 +13,9 @@ your browser.
 
 ## To Do
 
-[x] Produce an n-sided polygon of any color.
-[x] Implement collision detection for any even sided polygonal tessellation
-[ ] Improve collision detection to include odd sided polygons
-[ ] Implement logic to create non-overlapping patterns for polygons besides triangle, square, hexagon
-[ ] Abstract to apply to any parent HTML element.
-[ ] Add more interesting animations and utility.
+- [x] Produce an n-sided polygon of any color.
+- [x] Implement collision detection for any even sided polygonal tessellation
+- [ ] Improve collision detection to include odd sided polygons
+- [ ] Implement logic to create non-overlapping patterns for polygons besides triangle, square, hexagon
+- [ ] Abstract to apply to any parent HTML element.
+- [ ] Add more interesting animations and utility.

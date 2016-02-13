@@ -121,9 +121,10 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
     points = points.join(' ');
 
-    if (!isClipping(toStore) &&
-        !(x < -(radius) || x > $(document).width()) &&
-        !(y < -(radius) || y > $(document).height())) {
+    if (!isClipping(toStore)
+        // && !(x < -(radius) || x > $(document).width()) 
+        // && !(y < -(radius) || y > $(document).height())
+      ) {
 
       d3.select('svg')
         .append('polygon')

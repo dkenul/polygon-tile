@@ -71,8 +71,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
           finalOverlap = true;
         }
 
-
-
         if ((overlap == 2 && isOverlap && !(lastIsOverlap || firstOverlap && finalOverlap) || overlap > 2)) {
           return true;
         }
@@ -94,8 +92,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
     for (var i = 0; i < numSides; i++) {
       var x = (point[0] + radius * Math.sin(2*Math.PI*i/numSides + offset));
       var y = (point[1] - radius * Math.cos(2*Math.PI*i/numSides + offset));
-
-
 
       toStore.push([x,y])
       points.push(x + ',' + y);
@@ -306,32 +302,41 @@ var PolygonTile = function(radius, polyColor, numSides) {
     }.bind(this), delay)
   }
 
-  // this.render = function() {
-  //   var counter = 0;
-  //
-  //   while (1) {
-  //     startX = ($(window).width() - radius) / 2
-  //     startY = ($(window).height() - radius) / 2
-  //     if (counter == 0) {
-  //       d3.select('body')
-  //         .append('svg')
-  //         .attr('width', '100%')
-  //         .attr('height', '100%');
-  //
-  //       createPolygon([startX, startY]);
-  //     }
-  //
-  //
-  //     // $('polygon').each(function() {
-  //     //   var points = $( this ).attr('points');
-  //     //   createNewSquares(points);
-  //     // })
-  //
-  //     counter++;
-  //
-  //     if (counter == 40) {
-  //       break;
-  //     }
-  //   }
-  // };
+  this.render = function() {
+    var counter = 0;
+
+    while (1) {
+      startX = (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - radius) / 2
+      startY = (Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - radius) / 2
+
+      if (counter == 0) {
+        d3.select('body')
+          .append('svg')
+          .attr('width', '100%')
+          .attr('height', '100%');
+
+        createPolygon([startX, startY], 0);
+      } else {
+
+        d3.selectAll('.new-poly').each(function() {
+          var current = d3.select(this);
+          var center = current.datum().center;
+          var offset = current.datum().offset;
+
+          if (isRegular) {
+            appendRegular(center, offset, counter);
+          } else {
+            appendNonRegular(center, offset, counter);
+          }
+          current.classed('new-poly', false);
+        })
+      }
+
+      counter++;
+
+      if (counter == 25) {
+        break;
+      }
+    }
+  };
 };

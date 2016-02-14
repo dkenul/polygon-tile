@@ -12,32 +12,27 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var isRegular = numSides == 3 || numSides == 4 || numSides == 6;
   var tiltAmount = 0;
   var pointStore = [];
+  var centers = {};
 
   var checkRoundingError = function(num1, num2) {
     return (num1 == num2 || num1 + 1 == num2 || num1 - 1 == num2);
   }
 
-  // Checks for an Exact overlap. Better time complexity than isClipping.
-  // Useful only for 3, 4, 6 sided polygon tessellation.
+  // Checks for an Exact overlap. Very fast lookup with hashing (checks within 1 pixel).
+  // Useful only for 3, 4, 6 sided polygon tessellation because there can only be exact overlap.
 
-  var isOverlap = function(pointsToCheck) {
-    for (var i = 0; i < pointStore.length; i++) {
+  var isOverlap = function(center) {
+    center = [Math.round(center[0]), Math.round(center[1])];
+    x = center[0];
+    y = center[1];
 
-      var overlap = 0;
-      for (var j = 0; j < pointsToCheck.length; j++) {
-        if (checkRoundingError(Math.round(pointStore[i][j][0]), Math.round(pointsToCheck[j][0])) &&
-        checkRoundingError(Math.round(pointStore[i][j][1]), Math.round(pointsToCheck[j][1]))) {
-          overlap += 1;
-          if (overlap == numSides) {
-            return true;
-          }
-        } else {
-          break;
-        }
+    if (centers[center] || centers[[x+1, y]] || centers[[x-1, y]]
+      || centers[[x, y+1]] || centers[[x, y-1]] || centers[[x+1,y+1]]
+      || centers[[x-1,y-1]] || centers[[x+1,y-1]] || centers[[x-1,y+1]]) {
+        return true;
       }
-    }
 
-    return false;
+      return false;
   };
 
   // Checks for clipping ON POINT CONNECTIONS. This is not an area based analysis.
@@ -121,8 +116,9 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
     points = points.join(' ');
 
-    if (!isClipping(toStore)
-        // && !(x < -(radius) || x > $(document).width()) 
+    if ((isRegular && !isOverlap(point)
+        || !isRegular && !isClipping(toStore))
+        // && !(x < -(radius) || x > $(document).width())
         // && !(y < -(radius) || y > $(document).height())
       ) {
 
@@ -137,6 +133,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
         .datum({"center": point, "offset": offset, "iteration": iteration});
 
       pointStore.push(toStore);
+      centers[[Math.round(point[0]), Math.round(point[1])]] = true;
     }
 
   };
@@ -161,20 +158,30 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var appendNonRegular = function(point, offset, iteration) {
-    // debugger;
     offset = offset + tiltAmount || 0;
     var halfAngle = (Math.PI / numSides);
     var centerToSide = radius*Math.cos(halfAngle);
     offset += halfAngle;
     var increment;
+    var startIncrement = 0;
+
+    // NOT PERMANENT - Determine which sides to produce polygon on.
+    // This should be abstracted into some kind of options hash to determine
+    // pathing based on # sides.
+    // OR if it's possible to determine this mathematically that would be ideal.
 
     if (iteration == 1 && numSides == 5) {
       increment = 1;
+    } else if (numSides == 9) {
+      startIncrement = 1;
+      increment = 3;
+    } else if (numSides > 12) {
+      increment = 4;
     } else {
       increment = 2;
     }
 
-    for (var i = 0; i < numSides; i += increment) {
+    for (var i = startIncrement; i < numSides; i += increment) {
       var x = (point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset));
       var y = (point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset));
 
@@ -244,7 +251,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
       counter++;
 
-      if (counter == 30) {
+      if (counter == 25) {
         clearInterval(animationInterval);
       }
     }.bind(this), speed)

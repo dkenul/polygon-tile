@@ -1,3 +1,24 @@
+var isOverlap = function(pointsToCheck) {
+  for (var i = 0; i < pointStore.length; i++) {
+
+    var overlap = 0;
+    for (var j = 0; j < pointsToCheck.length; j++) {
+      if (checkRoundingError(Math.round(pointStore[i][j][0]), Math.round(pointsToCheck[j][0])) &&
+      checkRoundingError(Math.round(pointStore[i][j][1]), Math.round(pointsToCheck[j][1]))) {
+        overlap += 1;
+        if (overlap == numSides) {
+          return true;
+        }
+      } else {
+        break;
+      }
+    }
+  }
+
+  return false;
+};
+
+
 var parsePoints = function(points) {
   var result = [];
   points.split(' ').forEach(function(point) {

@@ -1,4 +1,4 @@
-# Polygon Tessellation
+# N-Sided Polygon Tile / Tessellation
 
 This project stemmed out of an svg animation I was working on to animate hexagons
 on a screen. The goal is to fully abstract this to an n-sided polygon of any size

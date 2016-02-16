@@ -108,7 +108,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
     var halfAngle = (Math.PI / numSides);
     var centerToSide = radius*Math.cos(halfAngle);
     offset += halfAngle;
-    var increment;
+    var increment = 1;
     var startIncrement = 0;
 
     // NOT PERMANENT - Determine which sides to produce polygon on.

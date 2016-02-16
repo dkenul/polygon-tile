@@ -13,6 +13,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var tiltAmount = 0;
   var pointStore = [];
   var centers = {};
+  var polygons = [];
 
   var checkRoundingError = function(num1, num2) {
     return (num1 == num2 || num1 + 1 == num2 || num1 - 1 == num2);
@@ -80,6 +81,23 @@ var PolygonTile = function(radius, polyColor, numSides) {
     });
   };
 
+  var centerBasedIsClipping = function(center) {
+    debugger;
+
+    var minLength = 2*radius * Math.cos(Math.PI / numSides);
+    var maxLength = 2*radius;
+
+    for (var i = 0; i < polygons.length; i++) {
+      var centerToCenter = Math.sqrt(Math.pow(center[0] - polygons[i]['center'][0], 2) + Math.pow(center[1] - polygons[i]['center'][1], 2))
+
+      if (Math.round(centerToCenter) < Math.round(minLength)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   var createPolygon = function(point, offset, iteration) {
 
     iteration = iteration || 0;
@@ -97,23 +115,25 @@ var PolygonTile = function(radius, polyColor, numSides) {
       points.push(x + ',' + y);
     }
 
-    if (!numSides % 2 == 0) {
-      if (offset == 0) {
-        rotations = 0;
-      } else if (Math.round(offset / referenceAngle) == 0) {
-        rotations = numSides - (offset / referenceAngle);
-      } else {
-        rotations = numSides - (offset - (referenceAngle / 2)) / referenceAngle;
-      }
+    // Rotation of points is no longer necessary with current overlap analysis
 
-      toStore.rotate(rotations);
-      points.rotate(rotations);
-    }
+    // if (!numSides % 2 == 0) {
+    //   if (offset == 0) {
+    //     rotations = 0;
+    //   } else if (Math.round(offset / referenceAngle) == 0) {
+    //     rotations = numSides - (offset / referenceAngle);
+    //   } else {
+    //     rotations = numSides - (offset - (referenceAngle / 2)) / referenceAngle;
+    //   }
+    //
+    //   toStore.rotate(rotations);
+    //   points.rotate(rotations);
+    // }
 
     points = points.join(' ');
 
     if ((isRegular && !isOverlap(point)
-        || !isRegular && !isClipping(toStore))
+        || !isRegular && !centerBasedIsClipping(point))
         // && !(x < -(radius) || x > $(document).width())
         // && !(y < -(radius) || y > $(document).height())
       ) {
@@ -129,7 +149,9 @@ var PolygonTile = function(radius, polyColor, numSides) {
         .datum({"center": point, "offset": offset, "iteration": iteration});
 
       pointStore.push(toStore);
+
       centers[[Math.round(point[0]), Math.round(point[1])]] = true;
+      polygons.push({"center": point, "sides": toStore})
     }
 
   };

@@ -71,3 +71,74 @@ var createNewSquares = function(points) {
 var round12 = function(num) {
   return +(Math.round(num + "e+12")  + "e-12");
 };
+
+// Rotation of points is no longer necessary with current overlap analysis
+
+// if (!numSides % 2 == 0) {
+//   if (offset == 0) {
+//     rotations = 0;
+//   } else if (Math.round(offset / referenceAngle) == 0) {
+//     rotations = numSides - (offset / referenceAngle);
+//   } else {
+//     rotations = numSides - (offset - (referenceAngle / 2)) / referenceAngle;
+//   }
+//
+//   toStore.rotate(rotations);
+//   points.rotate(rotations);
+// }
+
+var checkRoundingError = function(num1, num2) {
+  return (num1 == num2 || num1 + 1 == num2 || num1 - 1 == num2);
+}
+
+// Checks for clipping ON POINT CONNECTIONS. This is not an area based analysis.
+// Useful for collision detection when predefined path is guaranteed to work.
+// Very slow - is now deprecated.
+
+var isClipping = function(pointsToCheck) {
+  return pointStore.some(function(storedPoints) {
+    var overlap = 0;
+    var lastIsOverlap = false;
+    var isOverlap = false;
+    var sideCounter = 1;
+    var firstOverlap = false;
+    var finalOverlap = false;
+    return storedPoints.some(function(storedPoint) {
+
+
+      if (isOverlap) {
+        lastIsOverlap = true;
+      } else {
+        lastIsOverlap = false;
+      }
+
+      isOverlap = false;
+
+      pointsToCheck.forEach(function(checkPoint) {
+        if (checkRoundingError(Math.round(storedPoint[0]), Math.round(checkPoint[0])) &&
+        checkRoundingError(Math.round(storedPoint[1]), Math.round(checkPoint[1]))) {
+          overlap += 1;
+          isOverlap = true;
+        }
+      });
+
+      if (isOverlap && sideCounter == 1) {
+        firstOverlap = true;
+      } else if (isOverlap && sideCounter == numSides) {
+        finalOverlap = true;
+      }
+
+      if ((overlap == 2 && isOverlap && !(lastIsOverlap || firstOverlap && finalOverlap) || overlap > 2)) {
+        return true;
+      }
+
+      sideCounter++;
+    });
+  });
+};
+
+Array.prototype.rotate = function(n) {
+    while (this.length && n < 0) n += this.length;
+    this.push.apply(this, this.splice(0, n));
+    return this;
+};

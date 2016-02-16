@@ -1,9 +1,3 @@
-Array.prototype.rotate = function(n) {
-    while (this.length && n < 0) n += this.length;
-    this.push.apply(this, this.splice(0, n));
-    return this;
-};
-
 var PolygonTile = function(radius, polyColor, numSides) {
 
   var radius = radius || 50;
@@ -11,13 +5,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var numSides = numSides || 4;
   var isRegular = numSides == 3 || numSides == 4 || numSides == 6;
   var tiltAmount = 0;
-  var pointStore = [];
   var centers = {};
   var polygons = [];
-
-  var checkRoundingError = function(num1, num2) {
-    return (num1 == num2 || num1 + 1 == num2 || num1 - 1 == num2);
-  }
 
   // Checks for an Exact overlap. Very fast lookup with hashing (checks within 1 pixel).
   // Useful only for 3, 4, 6 sided polygon tessellation because there can only be exact overlap.
@@ -36,57 +25,12 @@ var PolygonTile = function(radius, polyColor, numSides) {
       return false;
   };
 
-  // Checks for clipping ON POINT CONNECTIONS. This is not an area based analysis.
-  // Useful for collision detection when predefined path is guaranteed to work.
-  // Very slow - soon to be deprecated. See function below.
-
-  var isClipping = function(pointsToCheck) {
-    return pointStore.some(function(storedPoints) {
-      var overlap = 0;
-      var lastIsOverlap = false;
-      var isOverlap = false;
-      var sideCounter = 1;
-      var firstOverlap = false;
-      var finalOverlap = false;
-      return storedPoints.some(function(storedPoint) {
-
-
-        if (isOverlap) {
-          lastIsOverlap = true;
-        } else {
-          lastIsOverlap = false;
-        }
-
-        isOverlap = false;
-
-        pointsToCheck.forEach(function(checkPoint) {
-          if (checkRoundingError(Math.round(storedPoint[0]), Math.round(checkPoint[0])) &&
-          checkRoundingError(Math.round(storedPoint[1]), Math.round(checkPoint[1]))) {
-            overlap += 1;
-            isOverlap = true;
-          }
-        });
-
-        if (isOverlap && sideCounter == 1) {
-          firstOverlap = true;
-        } else if (isOverlap && sideCounter == numSides) {
-          finalOverlap = true;
-        }
-
-        if ((overlap == 2 && isOverlap && !(lastIsOverlap || firstOverlap && finalOverlap) || overlap > 2)) {
-          return true;
-        }
-
-        sideCounter++;
-      });
-    });
-  };
-
   // Computes min and max distance between centers for polygons to touch but not overlap.
   // States that if the center to center distance is less than the min distance, there is definite overlap.
-  // O(n) time instead of above O(n^3) which was slowing animation down. 
+  // O(n) time instead of above O(n^3) which was slowing animation down.
+  // Should address a hole between min and max where clip can occur (this hole diminishes for higher side counts)
 
-  var centerBasedIsClipping = function(center) {
+  var isClipping = function(center) {
 
     var minLength = 2*radius * Math.cos(Math.PI / numSides);
     var maxLength = 2*radius;
@@ -102,42 +46,24 @@ var PolygonTile = function(radius, polyColor, numSides) {
     return false;
   };
 
-  var createPolygon = function(point, offset, iteration) {
+  var createPolygon = function(center, offset, iteration) {
 
     iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];
-    var toStore = [];
-    var rotations;
+    var pointsToStore = [];
     var referenceAngle = (2*Math.PI / numSides);
 
     for (var i = 0; i < numSides; i++) {
-      var x = (point[0] + radius * Math.sin(2*Math.PI*i/numSides + offset));
-      var y = (point[1] - radius * Math.cos(2*Math.PI*i/numSides + offset));
+      var x = (center[0] + radius * Math.sin(2*Math.PI*i/numSides + offset));
+      var y = (center[1] - radius * Math.cos(2*Math.PI*i/numSides + offset));
 
-      toStore.push([x,y])
+      pointsToStore.push([x,y])
       points.push(x + ',' + y);
     }
 
-    // Rotation of points is no longer necessary with current overlap analysis
-
-    // if (!numSides % 2 == 0) {
-    //   if (offset == 0) {
-    //     rotations = 0;
-    //   } else if (Math.round(offset / referenceAngle) == 0) {
-    //     rotations = numSides - (offset / referenceAngle);
-    //   } else {
-    //     rotations = numSides - (offset - (referenceAngle / 2)) / referenceAngle;
-    //   }
-    //
-    //   toStore.rotate(rotations);
-    //   points.rotate(rotations);
-    // }
-
-    points = points.join(' ');
-
-    if ((isRegular && !isOverlap(point)
-        || !isRegular && !centerBasedIsClipping(point))
+    if ((isRegular && !isOverlap(center)
+        || !isRegular && !isClipping(center))
         // && !(x < -(radius) || x > $(document).width())
         // && !(y < -(radius) || y > $(document).height())
       ) {
@@ -150,12 +76,10 @@ var PolygonTile = function(radius, polyColor, numSides) {
         .attr('stroke-width', 2)
         .attr('points', points)
         .attr("style", "fill-opacity:" + (Math.random() + 0.5) / 2)
-        .datum({"center": point, "offset": offset, "iteration": iteration});
+        .datum({"center": center, "offset": offset, "iteration": iteration});
 
-      pointStore.push(toStore);
-
-      centers[[Math.round(point[0]), Math.round(point[1])]] = true;
-      polygons.push({"center": point, "sides": toStore})
+      centers[[Math.round(center[0]), Math.round(center[1])]] = true;
+      polygons.push({"center": center, "points": pointsToStore})
     }
 
   };
@@ -200,7 +124,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
     } else if (numSides > 12) {
       increment = 4;
     } else {
-      increment = 2;
+      increment = 1;
     }
 
     for (var i = startIncrement; i < numSides; i += increment) {

@@ -116,15 +116,9 @@ var PolygonTile = function(radius, polyColor, numSides) {
     // pathing based on # sides.
     // OR if it's possible to determine this mathematically that would be ideal.
 
-    if (iteration == 1 && numSides == 5) {
-      increment = 1;
-    } else if (numSides == 9) {
+    if (numSides == 9) {
       startIncrement = 1;
       increment = 3;
-    } else if (numSides > 12) {
-      increment = 4;
-    } else {
-      increment = 1;
     }
 
     for (var i = startIncrement; i < numSides; i += increment) {

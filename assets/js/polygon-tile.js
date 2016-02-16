@@ -38,6 +38,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
   // Checks for clipping ON POINT CONNECTIONS. This is not an area based analysis.
   // Useful for collision detection when predefined path is guaranteed to work.
+  // Very slow - soon to be deprecated. See function below.
 
   var isClipping = function(pointsToCheck) {
     return pointStore.some(function(storedPoints) {
@@ -81,8 +82,11 @@ var PolygonTile = function(radius, polyColor, numSides) {
     });
   };
 
+  // Computes min and max distance between centers for polygons to touch but not overlap.
+  // States that if the center to center distance is less than the min distance, there is definite overlap.
+  // O(n) time instead of above O(n^3) which was slowing animation down. 
+
   var centerBasedIsClipping = function(center) {
-    debugger;
 
     var minLength = 2*radius * Math.cos(Math.PI / numSides);
     var maxLength = 2*radius;

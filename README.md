@@ -10,6 +10,9 @@ You can increase animation speed with optional parameters but working to make th
 To run this, you can simply download the folder and run the index.html file in
 your browser.
 
+Try it here:
+https://jsfiddle.net/dkenul/jwvkuqfy/
+
 ## To Do
 
 - [x] Produce an n-sided polygon of any color.

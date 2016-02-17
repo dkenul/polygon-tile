@@ -1,5 +1,12 @@
 var PolygonTile = function(radius, polyColor, numSides) {
 
+
+
+  var generateID = function() {
+    // Improve this
+    return Math.floor(Math.random() * 1000000);
+  }
+
   var radius = radius || 50;
   var polyColor = polyColor || 'blue';
   var numSides = numSides || 4;
@@ -7,6 +14,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var tiltAmount = 0;
   var centers = {};
   var polygons = [];
+  var element;
+  var objectID = generateID();
 
   // Checks for an Exact overlap. Very fast lookup with hashing (checks within 1 pixel).
   // Useful only for 3, 4, 6 sided polygon tessellation because there can only be exact overlap.
@@ -47,7 +56,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var createPolygon = function(center, offset, iteration) {
-
+    debugger;
     iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];
@@ -68,9 +77,9 @@ var PolygonTile = function(radius, polyColor, numSides) {
         // && !(y < -(radius) || y > $(document).height())
       ) {
 
-      d3.select('svg')
+      d3.select('.svg-' + objectID)
         .append('polygon')
-        .classed('new-poly ' + 'poly-' + iteration, true)
+        .classed('new-poly-' + objectID + ' poly-' + iteration, true)
         .attr('fill', polyColor)
         .attr('stroke', polyColor)
         .attr('stroke-width', 2)
@@ -133,6 +142,12 @@ var PolygonTile = function(radius, polyColor, numSides) {
     }
   };
 
+  this.on = function (el) {
+    element = el;
+
+    return this;
+  }
+
   this.tilt = function() {
     tiltAmount += (2*Math.PI / (numSides*2))
 
@@ -160,22 +175,27 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
   this.animate = function(speed) {
     speed = speed || 150;
+    element = element || 'body';
 
     var counter = 0;
-    var animationInterval = setInterval(function() {
-      startX = (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - radius) / 2
-      startY = (Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - radius) / 2
+    // var startX = (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - radius) / 2
+    // var startY = (Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - radius) / 2
 
+    var startX = d3.select(element).node().offsetWidth / 2
+    var startY = d3.select(element).node().offsetHeight / 2
+
+    var animationInterval = setInterval(function() {
       if (counter == 0) {
-        d3.select('body')
+        d3.select(element)
           .append('svg')
-          .attr('width', '100%')
-          .attr('height', '100%');
+          .classed('svg-' + objectID, true)
+          .attr('width', startX*2 + 'px')
+          .attr('height', startY*2 + 'px');
 
         createPolygon([startX, startY], 0);
       } else {
 
-        d3.selectAll('.new-poly').each(function() {
+        d3.selectAll('.new-poly-' + objectID).each(function() {
           var current = d3.select(this);
           var center = current.datum().center;
           var offset = current.datum().offset;
@@ -185,7 +205,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
           } else {
             appendNonRegular(center, offset, counter);
           }
-          current.classed('new-poly', false);
+          current.classed('new-poly-' + objectID, false);
         })
       }
 

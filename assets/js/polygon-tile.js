@@ -187,7 +187,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
           .append('svg')
           .classed('svg-' + objectID, true)
           .attr('width', startX*2 + 'px')
-          .attr('height', startY*2 + 'px');
+          .attr('height', startY*2 + 'px')
+          .style({'position': 'absolute', 'overflow': 'hidden'});
 
         createPolygon([startX, startY], 0);
       } else {

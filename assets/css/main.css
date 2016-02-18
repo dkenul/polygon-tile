@@ -27,12 +27,6 @@ html, body {
   font-weight: bold;
 }
 
-svg {
-  display: block;
-  position: absolute;
-  overflow: hidden;
-}
-
 div {
   display: inline-block;
   height: 500px;

@@ -1,7 +1,5 @@
 var PolygonTile = function(radius, polyColor, numSides) {
 
-
-
   var generateID = function() {
     // Improve this
     return Math.floor(Math.random() * 1000000);
@@ -56,7 +54,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var createPolygon = function(center, offset, iteration) {
-    debugger;
     iteration = iteration || 0;
     offset = offset + tiltAmount || 0;
     var points = [];

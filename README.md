@@ -19,6 +19,7 @@ https://jsfiddle.net/dkenul/jwvkuqfy/
 - [x] Implement collision detection for even sided polygons
 - [x] Improve collision detection to include odd sided polygons
 - [x] Implement logic to create non-overlapping patterns for polygons besides triangle, square, hexagon
-- [ ] Reduce time complexity of clip detection algorithms
-- [ ] Abstract to apply to any parent HTML element.
+- [x] Reduce time complexity of clip detection algorithms
+- [x] Abstract to apply to any parent HTML element.
+- [ ] Add appropriate CSS within PolygonTile object.
 - [ ] Add more interesting animations and utility.

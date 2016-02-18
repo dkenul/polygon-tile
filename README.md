@@ -21,5 +21,6 @@ https://jsfiddle.net/dkenul/jwvkuqfy/
 - [x] Implement logic to create non-overlapping patterns for polygons besides triangle, square, hexagon
 - [x] Reduce time complexity of clip detection algorithms
 - [x] Abstract to apply to any parent HTML element.
-- [ ] Add appropriate CSS within PolygonTile object.
+- [x] Add appropriate CSS within PolygonTile object.
+- [ ] Update other animations.
 - [ ] Add more interesting animations and utility.

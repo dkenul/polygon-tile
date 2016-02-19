@@ -31,6 +31,7 @@ div {
   display: inline-block;
   height: 500px;
   width: 500px;
+  margin: 50px;
 }
 
 .div1 {

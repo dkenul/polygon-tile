@@ -12,6 +12,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
   var tiltAmount = 0;
   var centers = {};
   var polygons = [];
+  var overflow = false;
   var element;
   var objectID = generateID();
 
@@ -70,13 +71,13 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
     if ((isRegular && !isOverlap(center)
         || !isRegular && !isClipping(center))
-        // && !(x < -(radius) || x > $(document).width())
-        // && !(y < -(radius) || y > $(document).height())
+        && !(center[0] < -(radius) || center[0] > d3.select(element).node().offsetWidth + radius)
+        && !(center[1] < -(radius) || center[1] > d3.select(element).node().offsetHeight + radius)
       ) {
 
       d3.select('.svg-' + objectID)
         .append('polygon')
-        .classed('new-poly-' + objectID + ' poly-' + iteration, true)
+        .classed('new-poly-' + objectID + ' poly-' + iteration + '-' + objectID, true)
         .attr('fill', polyColor)
         .attr('stroke', polyColor)
         .attr('stroke-width', 2)
@@ -145,6 +146,12 @@ var PolygonTile = function(radius, polyColor, numSides) {
     return this;
   }
 
+  this.overflow = function() {
+    overflow = !overflow;
+
+    return this;
+  }
+
   this.tilt = function() {
     tiltAmount += (2*Math.PI / (numSides*2))
 
@@ -157,7 +164,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
     var counter = 0;
 
     var animationInterval = setInterval(function() {
-      d3.selectAll('.poly-' + counter).each(function() {
+      d3.selectAll('.poly-' + counter + '-' + objectID).each(function() {
         var current = d3.select(this);
         current.style({display: "none"});
       })
@@ -175,9 +182,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
     element = element || 'body';
 
     var counter = 0;
-    // var startX = (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - radius) / 2
-    // var startY = (Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - radius) / 2
-
     var startX = d3.select(element).node().offsetWidth / 2
     var startY = d3.select(element).node().offsetHeight / 2
 
@@ -188,7 +192,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
           .classed('svg-' + objectID, true)
           .attr('width', startX*2 + 'px')
           .attr('height', startY*2 + 'px')
-          .style({'position': 'absolute', 'overflow': 'hidden'});
+          .style({'position': 'absolute', 'overflow': overflow ? 'visible' : 'hidden'});
 
         createPolygon([startX, startY], 0);
       } else {
@@ -209,9 +213,13 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
       counter++;
 
-      if (counter == 25) {
+      if (!d3.select('.new-poly-' + objectID).node()) {
         clearInterval(animationInterval);
       }
+
+      // if (counter == 25) {
+      //   clearInterval(animationInterval);
+      // }
     }.bind(this), speed)
   };
 
@@ -221,7 +229,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
     var counter = 0;
 
     var animationInterval = setInterval(function() {
-      d3.selectAll('.poly-' + counter).each(function() {
+      d3.selectAll('.poly-' + counter + '-' + objectID).each(function() {
         var current = d3.select(this);
         current.style({display: "block"});
       })

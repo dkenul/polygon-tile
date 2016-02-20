@@ -55,15 +55,14 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var createPolygon = function(center, offset, iteration) {
-    iteration = iteration || 0;
-    offset = offset + tiltAmount || 0;
+    debugger;
     var points = [];
     var pointsToStore = [];
     var referenceAngle = (2*Math.PI / numSides);
 
     for (var i = 0; i < numSides; i++) {
-      var x = (center[0] + radius * Math.sin(2*Math.PI*i/numSides + offset));
-      var y = (center[1] - radius * Math.cos(2*Math.PI*i/numSides + offset));
+      var x = (center[0] + radius * Math.sin(2*Math.PI*i/numSides + offset + tiltAmount));
+      var y = (center[1] - radius * Math.cos(2*Math.PI*i/numSides + offset + tiltAmount));
 
       pointsToStore.push([x,y])
       points.push(x + ',' + y);
@@ -92,15 +91,15 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var appendRegular = function(point, offset, iteration) {
-    offset = offset + tiltAmount || 0;
+    debugger;
     var halfAngle = (Math.PI / numSides);
     var centerToSide = radius*Math.cos(halfAngle);
     offset += halfAngle;
 
 
     for (var i = 0; i < numSides; i++) {
-      var x = (point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset));
-      var y = (point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset));
+      var x = (point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset + tiltAmount));
+      var y = (point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset + tiltAmount));
 
       if (numSides % 2 == 0) {
         createPolygon([x,y], 0, iteration);
@@ -111,7 +110,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var appendNonRegular = function(point, offset, iteration) {
-    offset = offset + tiltAmount || 0;
     var halfAngle = (Math.PI / numSides);
     var centerToSide = radius*Math.cos(halfAngle);
     offset += halfAngle;
@@ -129,8 +127,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
     }
 
     for (var i = startIncrement; i < numSides; i += increment) {
-      var x = (point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset));
-      var y = (point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset));
+      var x = (point[0] + 2*centerToSide * Math.sin(2*Math.PI*i/numSides + offset + tiltAmount));
+      var y = (point[1] - 2*centerToSide * Math.cos(2*Math.PI*i/numSides + offset + tiltAmount));
 
       if (numSides % 2 == 0) {
         createPolygon([x,y], 0, iteration);
@@ -278,7 +276,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
     var startY = d3.select(element).node().offsetHeight / 2;
 
     while (1) {
-      
+
       if (counter == 0) {
         d3.select(element)
           .append('svg')

@@ -182,8 +182,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
     element = element || 'body';
 
     var counter = 0;
-    var startX = d3.select(element).node().offsetWidth / 2
-    var startY = d3.select(element).node().offsetHeight / 2
+    var startX = d3.select(element).node().offsetWidth / 2;
+    var startY = d3.select(element).node().offsetHeight / 2;
 
     var animationInterval = setInterval(function() {
       if (counter == 0) {
@@ -274,21 +274,23 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
   this.render = function() {
     var counter = 0;
+    var startX = d3.select(element).node().offsetWidth / 2;
+    var startY = d3.select(element).node().offsetHeight / 2;
 
     while (1) {
-      startX = (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - radius) / 2
-      startY = (Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - radius) / 2
-
+      
       if (counter == 0) {
-        d3.select('body')
+        d3.select(element)
           .append('svg')
-          .attr('width', '100%')
-          .attr('height', '100%');
+          .classed('svg-' + objectID, true)
+          .attr('width', startX*2 + 'px')
+          .attr('height', startY*2 + 'px')
+          .style({'position': 'absolute', 'overflow': overflow ? 'visible' : 'hidden'});
 
         createPolygon([startX, startY], 0);
       } else {
 
-        d3.selectAll('.new-poly').each(function() {
+        d3.selectAll('.new-poly-' + objectID).each(function() {
           var current = d3.select(this);
           var center = current.datum().center;
           var offset = current.datum().offset;
@@ -298,14 +300,14 @@ var PolygonTile = function(radius, polyColor, numSides) {
           } else {
             appendNonRegular(center, offset, counter);
           }
-          current.classed('new-poly', false);
+          current.classed('new-poly-' + objectID, false);
         })
       }
 
       counter++;
 
-      if (counter == 25) {
-        break;
+      if (!d3.select('.new-poly-' + objectID).node()) {
+        clearInterval(animationInterval);
       }
     }
   };

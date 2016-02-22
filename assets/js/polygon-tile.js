@@ -68,6 +68,10 @@ var PolygonTile = function(radius, polyColor, numSides) {
       points.push(x + ',' + y);
     }
 
+    // introduction of these boundary conditions also introduces a fringe bug on 12 sided poly (potentially others)
+    // if it hits a boundary, goes to the next side which would normally be blocked
+    // can either check for this or introduce more specific pattern instructions 
+
     if ((isRegular && !isOverlap(center)
         || !isRegular && !isClipping(center))
         && !(center[0] < -(radius) || center[0] > d3.select(element).node().offsetWidth + radius)

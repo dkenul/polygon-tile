@@ -22,5 +22,6 @@ https://jsfiddle.net/dkenul/jwvkuqfy/
 - [x] Reduce time complexity of clip detection algorithms
 - [x] Abstract to apply to any parent HTML element.
 - [x] Add appropriate CSS within PolygonTile object.
+- [ ] Refactor various animation functions to DRY up code.
 - [ ] Update other animations.
 - [ ] Add more interesting animations and utility.

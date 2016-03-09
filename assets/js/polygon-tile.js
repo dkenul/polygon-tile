@@ -55,7 +55,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var createPolygon = function(center, offset, iteration) {
-    debugger;
     var points = [];
     var pointsToStore = [];
     var referenceAngle = (2*Math.PI / numSides);
@@ -70,7 +69,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
 
     // introduction of these boundary conditions also introduces a fringe bug on 12 sided poly (potentially others)
     // if it hits a boundary, goes to the next side which would normally be blocked
-    // can either check for this or introduce more specific pattern instructions 
+    // can either check for this or introduce more specific pattern instructions
 
     if ((isRegular && !isOverlap(center)
         || !isRegular && !isClipping(center))
@@ -95,7 +94,6 @@ var PolygonTile = function(radius, polyColor, numSides) {
   };
 
   var appendRegular = function(point, offset, iteration) {
-    debugger;
     var halfAngle = (Math.PI / numSides);
     var centerToSide = radius*Math.cos(halfAngle);
     offset += halfAngle;

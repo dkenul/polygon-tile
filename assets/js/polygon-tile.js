@@ -273,6 +273,8 @@ var PolygonTile = function(radius, polyColor, numSides) {
   }
 
   this.render = function() {
+    element = element || 'body';
+
     var counter = 0;
     var startX = d3.select(element).node().offsetWidth / 2;
     var startY = d3.select(element).node().offsetHeight / 2;
@@ -307,7 +309,7 @@ var PolygonTile = function(radius, polyColor, numSides) {
       counter++;
 
       if (!d3.select('.new-poly-' + objectID).node()) {
-        clearInterval(animationInterval);
+        break;
       }
     }
   };
